@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,8 @@ public class ItemServiceImpl implements ItemService {
 	private ItemRepository itemRepository;
 
 	@Autowired
-	private com.myntra.repository.PriceRepository PriceRepository;
-	private ModelMapper mapper = new ModelMapper();
+	protected com.myntra.repository.PriceRepository priceRepository;
+ ModelMapper mapper = new ModelMapper();
 
 	@Override
 	public ItemDto create(ItemDto itemDto) {
@@ -35,7 +35,7 @@ public class ItemServiceImpl implements ItemService {
 
 		try {
 
-			ModelMapper mapper = new ModelMapper();
+
 			ItemEntity itemEntity = mapper.map(itemDto, ItemEntity.class);
 
 			ItemEntity createdItem = itemRepository.save(itemEntity);
@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
 			return itemDto;
 
 		} catch (Exception e) {
-			log.error("error-saving item to database: {}", e);
+			log.error("error-saving item to database: ");
 		}
 		return null;
 	}
@@ -67,19 +67,19 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public ItemDto update(ItemDto itemDto) {
-		if (StringUtils.isEmpty(itemDto.getId())) {
+		if (ObjectUtils.isEmpty(itemDto.getId())) {
 			throw new ApiRuntimeException("Item ID cannot be NULL or Empty to UpdateItem", "NOT_FOUND",
 					HttpStatus.NOT_FOUND);
 		}
 
-		log.info("updating item {}", itemDto.toString());
+		log.info("updating item ");
 		ItemEntity itemEntity = mapper.map(itemDto, ItemEntity.class);
 
 		itemRepository.save(itemEntity);
 		log.info("Item updated successfully");
 
-		ItemDto updatedItemDto = mapper.map(itemEntity, ItemDto.class);
-		return updatedItemDto;
+		return  mapper.map(itemEntity, ItemDto.class);
+
 	}
 
 	@Override
@@ -107,10 +107,10 @@ public class ItemServiceImpl implements ItemService {
 			ItemEntity itemEntity = itemEntityOptional.get();
 			ItemDto itemDto = mapper.map(itemEntity, ItemDto.class);
 
-			PriceEntity PriceEntity = itemEntity.getItemPrice();
-			if (PriceEntity != null) {
-				PriceDto PriceDto = mapper.map(PriceEntity, PriceDto.class);
-				itemDto.setPriceDto(PriceDto);
+			PriceEntity priceEntity = itemEntity.getItemPrice();
+			if (priceEntity != null) {
+				PriceDto priceDto = mapper.map(priceEntity, PriceDto.class);
+				itemDto.setPriceDto(priceDto);
 			}
 
 			return itemDto;
@@ -122,54 +122,51 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public ItemDto assignPriceToItem(Long itemId, Long priceId) {
 
-		ItemEntity itemEntity = itemRepository.findById(itemId).get();
+		ItemEntity itemEntity;
+		itemEntity = itemRepository.findById(itemId).get();
 
-		PriceEntity PriceEntity = PriceRepository.findById(priceId).get();
+		PriceEntity priceEntity;
+		priceEntity = priceRepository.findById(priceId).get();
 
-		itemEntity.setItemPrice(PriceEntity);
+		itemEntity.setItemPrice(priceEntity);
 
 		itemRepository.save(itemEntity);
 
 		ItemDto itemDto = mapper.map(itemEntity, ItemDto.class);
 
-		PriceDto PriceDto = mapper.map(PriceEntity, PriceDto.class);
+		PriceDto priceDto = mapper.map(priceEntity, PriceDto.class);
 
-		itemDto.setPriceDto(PriceDto);
+		itemDto.setPriceDto(priceDto);
 
 		return itemDto;
 	}
 
+
+
 	@Override
 	public ItemDto updateProduct(ItemDto itemDto, Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		try {
 
-//	@Override
-//	public ItemDto updateProduct(ItemDto itemDto, Long id) {
-//		try {
-//			ModelMapper mapper = new ModelMapper();
-//			ItemEntity itemEntity = mapper.map(itemDto, ItemEntity.class);
-//			itemRepository.findById(id).get();
-//			itemEntity.setId(id);
-//			itemEntity.setAvailableQuantity(itemDto.getAvailableQuantity());
-//			itemEntity.setBrand(itemDto.getBrand());
-//			itemEntity.setCategory(itemDto.getCategory());
-//			itemEntity.setColor(itemDto.getColor());
-//			itemEntity.setQuantity(itemDto.getQuantity());
-//			itemEntity.setStock(itemDto.getStock());
-//			itemEntity.setDescription(itemDto.getDescription());
-//			itemEntity.setName(itemDto.getName());
-//			itemEntity.setDescription(itemDto.getDescription());
-//			ItemDto item = mapper.map(itemEntity, ItemDto.class);
-//
-//			return item;
-//		}
-//
-//		catch (Exception e) {
-//			log.error("Error while deleting item for Id : {}", id);
-//			throw new ApiRuntimeException("Error while deleting item for Id " + id, "INTERNAL_ERROR",
-//					HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//	}
+			ItemEntity itemEntity = mapper.map(itemDto, ItemEntity.class);
+			itemRepository.findById(id).get();
+			itemEntity.setId(id);
+			itemEntity.setAvailableQuantity(itemDto.getAvailableQuantity());
+			itemEntity.setBrand(itemDto.getBrand());
+			itemEntity.setCategory(itemDto.getCategory());
+			itemEntity.setColor(itemDto.getColor());
+			itemEntity.setQuantity(itemDto.getQuantity());
+			itemEntity.setDescription(itemDto.getDescription());
+			itemEntity.setName(itemDto.getName());
+			itemEntity.setDescription(itemDto.getDescription());
+			 return mapper.map(itemEntity, ItemDto.class);
+
+
+		}
+
+		catch (Exception e) {
+			log.error("Error while deleting item for Id : {}", id);
+			throw new ApiRuntimeException("Error while deleting item for Id " + id, "INTERNAL_ERROR",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

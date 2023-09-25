@@ -19,7 +19,7 @@ public class AddressController {
 
 
 	@Autowired
-	private AddressService addressService;
+	AddressService addressService;
 
 	@PostMapping("/address")
 	public ResponseEntity<AddressDto> create(@RequestBody AddressDto addressDto) {

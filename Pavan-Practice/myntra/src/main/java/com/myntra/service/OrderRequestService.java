@@ -3,15 +3,15 @@
 //
 //
 //public interface OrderRequestService {
-//	public OrderRequestDto create(OrderRequestDto orderRequestDto);
+// OrderRequestDto create(OrderRequestDto orderRequestDto);
 //
-//	public List<OrderRequestDto> getAll();
+// List<OrderRequestDto> getAll();
 //
-//	public Boolean delete(Long id);
+// Boolean delete(Long id);
 //
-//	public OrderRequestDto getById(Long id);
+// OrderRequestDto getById(Long id);
 //
-//	 public OrderRequestDto getPriceAfterDiscount(double price, double
+// OrderRequestDto getPriceAfterDiscount(double price, double
 //	 discountPercentage, long id);
 //
 //}

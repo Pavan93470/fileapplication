@@ -18,8 +18,8 @@ public class OrderTrackingServiceImpl implements OrderTrackingService {
 	public OrderTracking create(OrderTracking OrderTracking) {
 		OrderTrackingEntity orderTrackingEntity = mapper.map(OrderTracking, OrderTrackingEntity.class);
 		OrderTrackingEntity order = orderTrackingRepository.save(orderTrackingEntity);
-		OrderTracking OrderTrackingDto = mapper.map(order, OrderTracking.class);
-		return OrderTrackingDto;
+		return mapper.map(order, OrderTracking.class);
+
 	}
 
 }
