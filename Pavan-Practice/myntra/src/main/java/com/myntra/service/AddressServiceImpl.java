@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,6 @@ public class AddressServiceImpl implements AddressService {
 	private static final Logger log = LoggerFactory.getLogger(AddressServiceImpl.class);
 	@Autowired
 	private AddressRepository addressRepository;
-
 	ModelMapper mapper = new ModelMapper();
 
 	@Override
@@ -34,8 +33,8 @@ public class AddressServiceImpl implements AddressService {
 			AddressEntity userAddress = mapper.map(address, AddressEntity.class);
 			AddressEntity addressEntity = addressRepository.save(userAddress);
 
-			AddressDto addressDto = mapper.map(addressEntity, AddressDto.class);
-			return addressDto;
+			return mapper.map(addressEntity, AddressDto.class);
+
 		} catch (Exception e) {
 			log.error("", e);
 
@@ -47,7 +46,7 @@ public class AddressServiceImpl implements AddressService {
 	public List<AddressDto> getAll() {
 
 		List<AddressEntity> addressEntity = addressRepository.findAll();
-		List<AddressDto> addressList = new ArrayList<AddressDto>();
+		List<AddressDto> addressList = new ArrayList<>();
 		for (AddressEntity AddressEntity : addressEntity) {
 
 			AddressDto addressDto = mapper.map(AddressEntity, AddressDto.class);
@@ -57,20 +56,19 @@ public class AddressServiceImpl implements AddressService {
 	}
 
 	@Override
-	public AddressDto update(AddressDto AddressDto) {
-		if (StringUtils.isEmpty(AddressDto.getId())) {
+	public AddressDto update(AddressDto addressDtos) {
+		if (ObjectUtils.isEmpty(addressDtos.getId())) {
 			throw new ApiRuntimeException("Address ID cannot be NULL or Empty to UpdateItem", "NOT_FOUND",
 					HttpStatus.NOT_FOUND);
 		}
 
-		log.info("updating item {}", AddressDto.toString());
-		AddressEntity addressEntity = mapper.map(AddressDto, AddressEntity.class);
+		log.info("updating item");
+		AddressEntity addressEntity = mapper.map(addressDtos, AddressEntity.class);
 
 		AddressEntity address = addressRepository.save(addressEntity);
 		log.info("Address updated successfully");
 
-		AddressDto addressDto = mapper.map(address, AddressDto.class);
-		return addressDto;
+		return mapper.map(address, AddressDto.class);
 	}
 
 	@Override
@@ -96,14 +94,14 @@ public class AddressServiceImpl implements AddressService {
 		if (addressEntityOptional.isPresent()) {
 
 			AddressEntity addressEntity = addressEntityOptional.get();
-			AddressDto AddressDto = mapper.map(addressEntity, AddressDto.class);
+			AddressDto addressDto = mapper.map(addressEntity, AddressDto.class);
 
 			UserEntity userEntity = addressEntity.getUser();
 			if (userEntity != null) {
 				UserDto userDto = mapper.map(userEntity, UserDto.class);
-				AddressDto.setUserDto(userDto);
+				addressDto.setUserDto(userDto);
 			}
-			return AddressDto;
+			return addressDto;
 		}
 		log.error("Address not found for Id : {}", id);
 		throw new ApiRuntimeException("Address Not Found for ID: " + id, "NOT_FOUND", HttpStatus.NOT_FOUND);
